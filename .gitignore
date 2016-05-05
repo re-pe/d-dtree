@@ -1,6 +1,6 @@
 /.project
+/doc
 *.log
-*.bat
 *.lnk
 .dub
 docs.json

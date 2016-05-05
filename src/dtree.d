@@ -628,115 +628,66 @@ struct DTree {
 
 struct DHandler {
 
-    private SetTo[string] _settings;
-    private SetTo[string] _defaultSettings;
     private string _format;
-    private DTree delegate(string str, in SetTo[string] settings) _parse;
-    private string delegate(const DTree tree, in SetTo[string] settings) _generate;
-
-    private bool _concArgs(ref SetTo[string] _settings, SetTo[string] settings){
-        foreach (key, value; settings){
-            if (value.type == typeid(bool)){
-                 _settings[key] = value.get!bool;
-                 
-            } else if (value.type == typeid(long)){
-                 _settings[key] = value.get!long;
-                 
-            } else if (value.type == typeid(ulong)){
-                 _settings[key] = value.get!ulong;
-                 
-            } else if (value.type == typeid(string)){
-                 _settings[key] = value.get!string;
-                 
-            } else if (value.type == typeid(DOptions)){
-                 _settings[key] = value.get!DOptions;
-                 
-            }
-        }
-        return true;
-    }
-    
+    private DConverter[string] _converters;
     DTree tree;
     alias tree this;
     
-    this(
-        string format,
-        SetTo[string] settings,
-        DTree delegate(string str, in SetTo[string] settings) parse, 
-        string delegate(const DTree tree, in SetTo[string] settings) generate
-    ){
-        _format = format;
-        _defaultSettings = settings;
-        _settings = settings;
-        _parse = parse;
-        _generate = generate;
+    this(DConverter[] converters ...){
+        import std.uni : toLower;
+        if (converters.length > 0) _format = toLower(converters[0].format);
+        foreach (key, value; converters){
+            _converters[toLower(value.format)] = value;
+        }
     }
     
-    DHandler opCall(string str){
-        tree = _parse(str, _settings);
-        return this;
+    import std.uni : toLower;
+    DConverter* hasConverter(string format){
+        return toLower(format) in _converters;
     }
 
-    DHandler opCall(){
-        tree = null;
-        return this;
+    @property string defaultFormat() pure nothrow @safe @nogc {
+        return _format;
     }
 
-    @property string format() const pure nothrow @safe @nogc {
+    @property string defaultFormat(string format){
+        enforce!DException(hasConverter(format), "Converter " ~ format  ~ " doesn't exist!" );
+        _format = toLower(format);
         return _format;
     }
     
-    /// Value getter/setter for $(D DType.String).
-    /// Throws: $(D DException) for read access if $(D type) is not
-    /// $(D DType.String).
-    @property ref SetTo[string] settings() pure @trusted {
-        return _settings;
+    @property ref DConverter Converter() {
+        return _converters[_format];
     }
 
-    /// ditto
-    ref SetTo[string] set() pure nothrow @nogc @safe {
-        _settings = _defaultSettings;
-        return _settings;
+    @property ref DConverter Converter(string format){
+        enforce!DException(hasConverter(format), "Converter " ~ format  ~ " doesn't exist!" );
+        return _converters[toLower(format)];
     }
-
-    ref SetTo[string] set(SetTo[string] settings) {
-        _concArgs(_settings, settings);
-        return _settings;
-    }
-
-    ref SetTo set(string key, SetTo setting) {
-        enforce!DException(key in settings, "Key " ~ key ~ " doesn't exist!" );
-        _settings[key] = setting;
-        return _settings[key];
-    }
-
-    ref SetTo[string] get() pure @safe {
-        return _settings;
-    }
-
-    ref SetTo get(string key) pure @safe {
-        enforce!DException(key == "", "Key " ~ key ~ " doesn't exist!" );
-        return _settings[key];
-    }
-
-
     /// Value getter/setter for $(D DType.String).
     /// Throws: $(D DException) for read access if $(D type) is not
     /// $(D DType.String).
     
-    @property string toFormat() const @trusted {
-        return _generate(tree, _settings);
+    @property string toFormat() @trusted {
+        return _converters[_format].toFormat(tree);
+    }
+
+    @property string toFormat(string format) @trusted {
+        enforce!DException(hasConverter(format), "Converter " ~ format  ~ " doesn't exist!" );
+        return _converters[toLower(format)].toFormat(tree);
     }
 
     @property string toPrettyFormat() @trusted {
-        this.set("pretty", SetTo(true));
-        auto result = _generate(tree, _settings);
-        this.set("pretty", SetTo(false));
-        return result;
+        return _converters[_format].toPrettyFormat(tree);
     }
     
+    @property string toPrettyFormat(string format) @trusted {
+        enforce!DException(hasConverter(format), "Converter " ~ format  ~ " doesn't exist!" );
+        return _converters[toLower(format)].toPrettyFormat(tree);
+    }
+
     @property ref DHandler toTree(string str) {
-        tree = _parse(str, _settings);
+        tree = Converter.parse(str);
         return this;
     }
     
@@ -847,26 +798,128 @@ unittest {
     assert(jv3.String == "\u001C");
 }
 
-DHandler JSONHandler() {
+struct DConverter {
+    private string _format;
+    private SetTo[string] _settings;
+    private SetTo[string] _defaultSettings;
+    private DTree delegate(string jsonStr, in SetTo[string] settings) _parse;
+    private string delegate(const DTree tree, in SetTo[string] settings) _generate;
+    
+    this(
+        string format,
+        SetTo[string] settings,
+        DTree delegate(string str, in SetTo[string] settings) parse, 
+        string delegate(const DTree tree, in SetTo[string] settings) generate
+    ){
+        _format = format;
+        _defaultSettings = settings;
+        _settings = settings;
+        _parse = parse;
+        _generate = generate;
+    }
+    
+    private bool _concArgs(SetTo[string] settings){
+        foreach (key, value; settings){
+            if (value.type == typeid(bool)){
+                 _settings[key] = value.get!bool;
+                 
+            } else if (value.type == typeid(long)){
+                 _settings[key] = value.get!long;
+                 
+            } else if (value.type == typeid(ulong)){
+                 _settings[key] = value.get!ulong;
+                 
+            } else if (value.type == typeid(string)){
+                 _settings[key] = value.get!string;
+                 
+            } else if (value.type == typeid(DOptions)){
+                 _settings[key] = value.get!DOptions;
+                 
+            }
+        }
+        return true;
+    }
+    
+    DTree parse(string jsonStr){
+        return _parse(jsonStr, _settings);
+    }
+    
+    string toFormat(DTree tree){
+        return _generate(tree, _settings);
+    }
+
+    string toPrettyFormat(DTree tree){
+        set("pretty", SetTo(true));
+        string result = _generate(tree, _settings);
+        set("pretty", SetTo(false));
+        return result;
+    }
+
+    /// Value getter/setter for $(D DType.String).
+    /// Throws: $(D DException) for read access if $(D type) is not
+    /// $(D DType.String).
+    @property ref SetTo[string] settings() pure @trusted {
+        return _settings;
+    }
+
+    /// ditto
+    ref SetTo[string] set() pure nothrow @nogc @safe {
+        _settings = _defaultSettings;
+        return _settings;
+    }
+
+    ref SetTo[string] set(SetTo[string] settings) {
+        _concArgs(settings);
+        return _settings;
+    }
+
+    ref SetTo set(string key, SetTo setting) {
+        enforce!DException(key in settings, "Key " ~ key ~ " doesn't exist!" );
+        _settings[key] = setting;
+        return _settings[key];
+    }
+
+    ref SetTo[string] get() pure @safe {
+        return _settings;
+    }
+
+    ref SetTo get(string key) pure @safe {
+        enforce!DException(key == "", "Key " ~ key ~ " doesn't exist!" );
+        return _settings[key];
+    }
+
+    @property string format() const pure nothrow @safe @nogc {
+        return _format;
+    } 
+    
+} 
+
+DConverter JSONConv() {
     SetTo[string] settings = ["maxDepth" : SetTo(-1), "pretty" : SetTo(false), "dOptions" : SetTo(DOptions.none)];
 
-    return DHandler(
+    return DConverter(
         "JSON",
         settings,
-        delegate(string jsonStr, in SetTo[string] settings){
-            enforce!DException("maxDepth" in settings, "Key maxDepth doesn't exist!" );
-            int maxDepth = settings["maxDepth"].get!int;
-            enforce!DException("dOptions" in settings, "Key dOptions doesn't exist!" );
-            DOptions options = settings["dOptions"].get!DOptions;
-
+        delegate(string jsonStr, in SetTo[string] settings = settings){
+            int maxDepth = -1;
+            if("maxDepth" in settings){
+                maxDepth = settings["maxDepth"].get!int;
+            }
+            DOptions options = DOptions.none;
+            if("dOptions" in settings){
+                options = settings["dOptions"].get!DOptions;
+            }
             return parseJSON(jsonStr, maxDepth, options);
         },
-        delegate(const DTree tree, in SetTo[string] settings){
-            enforce!DException("pretty" in settings, "Key pretty doesn't exist!" );
-            bool pretty = settings["pretty"].get!bool;
-            enforce!DException("dOptions" in settings, "Key dOptions doesn't exist!" );
-            DOptions options = settings["dOptions"].get!DOptions;
-
+        delegate(const DTree tree, in SetTo[string] settings = settings){
+            bool pretty = false;
+            if ("pretty" in settings){
+                pretty = settings["pretty"].get!bool;
+            }
+            DOptions options = DOptions.none;
+            if ("dOptions" in settings){
+                options = settings["dOptions"].get!DOptions;
+            }
             return toJSON(tree, pretty, options);
         }
     );
@@ -1571,10 +1624,10 @@ unittest {
 
 unittest {
   auto json = `"hello\nworld"`;
-  auto jh = JSONHandler();
-  jh.tree = parseJSON(json);
-  assert(jh.toFormat == json);
-  assert(jh.toPrettyFormat == json);
+  auto jc = JSONConv();
+  auto tree = parseJSON(json);
+  assert(jc.toFormat(tree) == json);
+  assert(jc.toPrettyFormat(tree) == json);
 }
 
 pure unittest {
@@ -1633,15 +1686,15 @@ unittest {
         infString         = '"' ~ DFloatLiteral.inf         ~ '"',
         negativeInfString = '"' ~ DFloatLiteral.negativeInf ~ '"',
     }
-    auto jh = JSONHandler;
+    auto jh = DHandler(JSONConv);
     // with the specialFloatLiterals option, encode NaN/Inf as strings
-    jh.set("dOptions", SetTo(DOptions.specialFloatLiterals));
+    jh.Converter.set("dOptions", SetTo(DOptions.specialFloatLiterals));
     assert(jh.Tree(float.nan).toFormat()       == nanString);
     assert(jh.Tree(double.infinity).toFormat() == infString);
     assert(jh.Tree(-real.infinity).toFormat()  == negativeInfString);
 
     // without the specialFloatLiterals option, throw on encoding NaN/Inf
-    jh.set("dOptions", SetTo(DOptions.none));
+    jh.Converter.set("dOptions", SetTo(DOptions.none));
     assertThrown!DException(jh.Tree(float.nan).toFormat);
     assertThrown!DException(jh.Tree(double.infinity).toFormat);
     assertThrown!DException(jh.Tree(-real.infinity).toFormat);

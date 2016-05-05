@@ -87,7 +87,7 @@ int main(string[] args) {
         { "numbers" : [9, 1955.3], "language": {"a" : "D"} , "names" : ["Jonas", "Petras"], "mix" : ["abc", 123 ] }
     /";
     writeln("jsonStr => ", jsonStr);
-    auto jsonHandler = JSONHandler();
+    auto dHandler = DHandler(JSONConv);
 
  /*     tree_json.value = json.toDTree(jsonStr);
     writeln("tree_json.value => ", tree_json.value);
@@ -96,30 +96,37 @@ int main(string[] args) {
     writeln("tree_json.type == typeid(DTree[string]) => ", tree_json.type == typeid(DTree[string]));
     writeln();
  */    
-    //jsonHandler.tree(jsonStr);
-    //jsonHandler.String = jsonStr;
-    writeln("jsonHandler.toTree(jsonStr).toFormat => ", jsonHandler.toTree(jsonStr).toFormat);
-    writeln("jsonHandler => ", jsonHandler);
-    auto obj = jsonHandler.tree.Object;
-    writeln("jsonHandler.tree.toString(true, true) => ", jsonHandler.tree.toString(true, true));
-    //writeln("jsonHandler.tree.value => ", jsonHandler.tree.value);
-    //writeln("jsonHandler.tree.value.type => ", jsonHandler.tree.value.type);
-    //writeln("jsonHandler.tree.type => ", jsonHandler.tree.type);
-    writeln("jsonHandler.format => ", jsonHandler.format);
-    writeln("jsonHandler.type => ", jsonHandler.type);
-    writeln("jsonHandler.tree => ", jsonHandler.tree);
+    //dHandler.tree(jsonStr);
+    dHandler.String = jsonStr;
+    writeln("dHandler.toTree(jsonStr).toFormat => ", dHandler.toTree(jsonStr).toFormat);
+    writeln("dHandler => ", dHandler);
+    auto obj = dHandler.tree.Object;
+    writeln("dHandler.tree.toString(false, false) => \n", dHandler.tree.toString(false, false), "\n");
+    writeln("dHandler.tree.toString(true, false) => \n", dHandler.tree.toString(true, false), "\n");
+    writeln("dHandler.tree.toString(false, true) => \n", dHandler.tree.toString(false, true), "\n");
+    writeln("dHandler.tree.toString(true, true) => \n", dHandler.tree.toString(true, true), "\n");
+    //writeln("dHandler.tree.value => ", dHandler.tree.value);
+    //writeln("dHandler.tree.value.type => ", dHandler.tree.value.type);
+    //writeln("dHandler.tree.type => ", dHandler.tree.type);
+    writeln(`dHandler.defaultFormat => `, dHandler.defaultFormat);
+    writeln(`dHandler.Converter().format => `, dHandler.Converter().format);
+    auto conv = dHandler.Converter();
+    writeln();
+    writeln(`dHandler.defaultFormat("json") => `, dHandler.defaultFormat("json"));
+    writeln("dHandler.type => ", dHandler.type);
+    writeln("dHandler.tree => ", dHandler.tree);
     writeln();
 
-    writeln("jsonHandler.toFormat => ", jsonHandler.toFormat); 
-    //writeln("jsonHandler.set([\"pretty\" : SetTo(true)];");
-    //jsonHandler.set(["pretty" : SetTo(true)]);
-    write("jsonHandler.set(\"pretty\", SetTo(true)) => ");
-    writeln(jsonHandler.set("pretty", SetTo(true)));
-    writeln("jsonHandler.toFormat => ", jsonHandler.toFormat); 
-    writeln("jsonHandler.set();");
-    jsonHandler.set();
-    writeln("jsonHandler.toFormat => ", jsonHandler.toFormat); 
-    writeln();
+    writeln("dHandler.toFormat => ", dHandler.toFormat); 
+    //writeln("dHandler.set([\"pretty\" : SetTo(true)];");
+    //dHandler.set(["pretty" : SetTo(true)]);
+    write("dHandler.set(\"pretty\", SetTo(true)) => ");
+    //writeln(dHandler.set("pretty", SetTo(true)));
+   // writeln("dHandler.toFormat => ", dHandler.toFormat); 
+    //writeln("dHandler.set();");
+    //dHandler.set();
+    //writeln("dHandler.toFormat => ", dHandler.toFormat); 
+    //writeln();
     
 /**/
 /*     //tree_dobject = DTree(["string" : tree_str, "long" : tree_long, "double" : tree_double, "darray" : tree_darray]);
