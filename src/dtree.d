@@ -15,10 +15,10 @@ Synopsis:
     // j and j["language"] return DTree,
     // j["language"].String returns a string
 
-    //check a type
+    //check a Type
     long x;
     if (const(DTree)* code = "code" in j) {
-        if (code.type() == DType.Long)
+        if (code.Type() == DType.Long)
             x = code.Long;
         else
             x = to!int(code.String);
@@ -79,11 +79,11 @@ enum DOptions {
 alias SetTo  = Algebraic!(bool, int, uint, long, ulong, string, DOptions);
 
 /**
-JSON type enumeration
+JSON Type enumeration
 */
 
 enum DType : string {
-    Null   = "Null"   ,  /// Indicates the type of a $(D DTree).
+    Null   = "Null"   ,  /// Indicates the Type of a $(D DTree).
     Bool   = "Bool"   ,  /// ditto
     String = "String" ,  /// ditto
     Long   = "Long"   ,  /// ditto
@@ -112,22 +112,22 @@ struct DTree {
     /**
       Returns the DType of the value _valued in this structure.
     */
-    @property DType type() const pure nothrow @safe @nogc {
+    @property DType Type() const pure nothrow @safe @nogc {
         return _type;
     }
     ///
     unittest {
           string s = `{ "language": "D" }`;
           DTree j = parseJSON(s);
-          assert(j.type == DType.Object);
-          assert(j["language"].type == DType.String);
+          assert(j.Type == DType.Object);
+          assert(j["language"].Type == DType.String);
     }
 
     /// Value getter/setter for $(D DType.String).
-    /// Throws: $(D DException) for read access if $(D type) is not
+    /// Throws: $(D DException) for read access if $(D Type) is not
     /// $(D DType.String).
     @property bool Bool() const pure @trusted {
-        enforce!DException(type == DType.Bool, "DTree value is not a boolean");
+        enforce!DException(_type == DType.Bool, "DTree value is not a boolean");
         return _value.Bool;
     }
     /// ditto
@@ -148,10 +148,10 @@ struct DTree {
     }
 
     /// Value getter/setter for $(D DType.String).
-    /// Throws: $(D DException) for read access if $(D type) is not
+    /// Throws: $(D DException) for read access if $(D Type) is not
     /// $(D DType.String).
     @property string String() const pure /*@safe*/ @trusted {
-        enforce!DException(type == DType.String, "DTree value is not a string");
+        enforce!DException(_type == DType.String, "DTree value is not a string");
         return _value.String;
     }
     /// ditto
@@ -172,10 +172,10 @@ struct DTree {
     }
 
     /// Value getter/setter for $(D DType.Long).
-    /// Throws: $(D DException) for read access if $(D type) is not
+    /// Throws: $(D DException) for read access if $(D Type) is not
     /// $(D DType.Long).
     @property inout(long) Long() inout pure @safe /*@trusted*/ {
-        enforce!DException(type == DType.Long, "DTree value is not an long");
+        enforce!DException(_type == DType.Long, "DTree value is not an long");
         return _value.Long;
     }
     /// ditto
@@ -185,10 +185,10 @@ struct DTree {
     }
 
     /// Value getter/setter for $(D DType.Ulong).
-    /// Throws: $(D DException) for read access if $(D type) is not
+    /// Throws: $(D DException) for read access if $(D Type) is not
     /// $(D DType.Ulong).
     @property inout(ulong) Ulong() inout pure @safe {
-        enforce!DException(type == DType.Ulong, "DTree value is not an unsigned long");
+        enforce!DException(_type == DType.Ulong, "DTree value is not an unsigned long");
         return _value.Ulong;
     }
     /// ditto
@@ -198,10 +198,10 @@ struct DTree {
     }
 
     /// Value getter/setter for $(D DType.Double).
-    /// Throws: $(D DException) for read access if $(D type) is not
+    /// Throws: $(D DException) for read access if $(D Type) is not
     /// $(D DType.Double).
     @property inout(double) Double() inout pure @safe {
-        enforce!DException(type == DType.Double, "DTree value is not a Double type");
+        enforce!DException(_type == DType.Double, "DTree value is not a Double Type");
         return _value.Double;
     }
     /// ditto
@@ -211,7 +211,7 @@ struct DTree {
     }
 
     /// Value getter/setter for $(D DType.Object).
-    /// Throws: $(D DException) for read access if $(D type) is not
+    /// Throws: $(D DException) for read access if $(D Type) is not
     /// $(D DType.Object).
     /* Note: this is @system because of the following pattern:
        ---
@@ -221,7 +221,7 @@ struct DTree {
        ---
      */
     @property ref inout(DTree[string]) Object() inout pure /*@system*/ @trusted {
-        enforce!DException(type == DType.Object, "DTree value is not an Object");
+        enforce!DException(_type == DType.Object, "DTree value is not an Object");
         return _value.Object;
     }
     /// ditto
@@ -237,19 +237,19 @@ struct DTree {
     /// ---
     /// DTree json;
     /// json.Object = null;
-    /// json.objectNoRef["hello"] = DTree("world");
+    /// json.ObjectNoRef["hello"] = DTree("world");
     /// assert("hello" !in json.Object);
     /// ---
     ///
-    /// Throws: $(D DException) for read access if $(D type) is not
+    /// Throws: $(D DException) for read access if $(D Type) is not
     /// $(D DType.Object).
-    @property inout(DTree[string]) objectNoRef() inout pure @trusted {
-        enforce!DException(type == DType.Object, "DTree value is not an Object");
+    @property inout(DTree[string]) ObjectNoRef() inout pure @trusted {
+        enforce!DException(_type == DType.Object, "DTree value is not an Object");
         return _value.Object;
     }
 
     /// Value getter/setter for $(D DType.Array).
-    /// Throws: $(D DException) for read access if $(D type) is not
+    /// Throws: $(D DException) for read access if $(D Type) is not
     /// $(D DType.Array).
     /* Note: this is @system because of the following pattern:
        ---
@@ -259,7 +259,7 @@ struct DTree {
        ---
      */
     @property ref inout(DTree[]) Array() inout pure @system {
-        enforce!DException(type == DType.Array, "DTree value is not an Array");
+        enforce!DException(_type == DType.Array, "DTree value is not an Array");
         return _value.Array;
     }
     /// ditto
@@ -276,20 +276,20 @@ struct DTree {
     /// ---
     /// DTree json;
     /// json.Array = [DTree("hello")];
-    /// json.arrayNoRef ~= DTree("world");
+    /// json.ArrayNoRef ~= DTree("world");
     /// assert(json.Array.length == 1);
     /// ---
     ///
-    /// Throws: $(D DException) for read access if $(D type) is not
+    /// Throws: $(D DException) for read access if $(D Type) is not
     /// $(D DType.Array).
-    @property inout(DTree[]) arrayNoRef() inout pure @trusted {
-        enforce!DException(type == DType.Array, "DTree value is not an Array");
+    @property inout(DTree[]) ArrayNoRef() inout pure @trusted {
+        enforce!DException(_type == DType.Array, "DTree value is not an Array");
         return _value.Array;
     }
 
-    /// Test whether the type is $(D DType.Null)
+    /// Test whether the Type is $(D DType.Null)
     @property bool isNull() const pure nothrow @safe @nogc {
-        return type == DType.Null;
+        return _type == DType.Null;
     }
 
     private void assign(T)(T arg) @safe {
@@ -333,10 +333,10 @@ struct DTree {
                 _value.Array = new_arg;
             }
         } else static if(is(T : DTree)) {
-            _type = arg.type;
+            _type = arg._type;
             _value = arg._value;
         } else {
-            static assert(false, text(`unable to convert type "`, T.stringof, `" to json`));
+            static assert(false, text(`unable to convert Type "`, T.stringof, `" to json`));
         }
     }
 
@@ -354,14 +354,14 @@ struct DTree {
 
     /**
      * Constructor for $(D DTree). If $(D arg) is a $(D DTree)
-     * its value and type will be copied to the new $(D DTree).
-     * Note that this is a shallow copy: if type is $(D DType.Object)
+     * its value and Type will be copied to the new $(D DTree).
+     * Note that this is a shallow copy: if Type is $(D DType.Object)
      * or $(D DType.Array) then only the reference to the data will
      * be copied.
      * Otherwise, $(D arg) must be implicitly convertible to one of the
      * following types: $(D typeof(null)), $(D string), $(D ulong),
      * $(D long), $(D double), an associative Array $(D V[K]) for any $(D V)
-     * and $(D K) i.e. a JSON Object, any Array or $(D bool). The type will
+     * and $(D K) i.e. a JSON Object, any Array or $(D bool). The Type will
      * be set accordingly.
     */
     this(T)(T arg) if(!isStaticArray!T) {
@@ -374,7 +374,7 @@ struct DTree {
     /// Ditto
     this(T : DTree)(inout T arg) inout {
         _value = arg._value;
-        _type = arg.type;
+        _type = arg._type;
     }
     ///
     unittest {
@@ -382,10 +382,10 @@ struct DTree {
         j = DTree(42);
 
         j = DTree( [1, 2, 3] );
-        assert(j.type == DType.Array);
+        assert(j.Type == DType.Array);
 
         j = DTree( ["language": "D"] );
-        assert(j.type == DType.Object);
+        assert(j.Type == DType.Object);
     }
 
     void opAssign(T)(T arg) if(!isStaticArray!T && !is(T : DTree)) {
@@ -397,9 +397,9 @@ struct DTree {
     }
 
     /// Array syntax for json arrays.
-    /// Throws: $(D DException) if $(D type) is not $(D DType.Array).
+    /// Throws: $(D DException) if $(D Type) is not $(D DType.Array).
     ref inout(DTree) opIndex(size_t i) inout pure @safe {
-        auto a = this.arrayNoRef;
+        auto a = this.ArrayNoRef;
         enforceEx!DException(i < a.length,
                                 "DTree Array index is out of range");
         return a[i];
@@ -412,9 +412,9 @@ struct DTree {
     }
 
     /// Hash syntax for json objects.
-    /// Throws: $(D DException) if $(D type) is not $(D DType.Object).
+    /// Throws: $(D DException) if $(D Type) is not $(D DType.Object).
     ref inout(DTree) opIndex(string k) inout pure @safe {
-        auto o = this.objectNoRef;
+        auto o = this.ObjectNoRef;
         return *enforce!DException(k in o, "Key not found: " ~ k);
     }
     ///
@@ -428,16 +428,16 @@ struct DTree {
     /// If JSON value is null, then operator initializes it with Object and then
     /// sets $(D value) for it.
     ///
-    /// Throws: $(D DException) if $(D type) is not $(D DType.Object)
+    /// Throws: $(D DException) if $(D Type) is not $(D DType.Object)
     /// or $(D DType.Null).
     void opIndexAssign(T)(auto ref T value, string key) pure {
         enforceEx!DException(
-            type == DType.Object || type == DType.Null,
+            _type == DType.Object || _type == DType.Null,
             "DTree must be Object or null"
         );
         DTree[string] aa = null;
-        if (type == DType.Object) {
-            aa = this.objectNoRef;
+        if (_type == DType.Object) {
+            aa = this.ObjectNoRef;
         }
 
         aa[key] = value;
@@ -451,7 +451,7 @@ struct DTree {
     }
 
     void opIndexAssign(T)(T arg, size_t i) pure {
-        auto a = this.arrayNoRef;
+        auto a = this.ArrayNoRef;
         enforceEx!DException(i < a.length, "DTree Array index is out of range");
         a[i] = arg;
         this.Array = a;
@@ -464,22 +464,22 @@ struct DTree {
     }
 
     DTree opBinary(string op : "~", T)(T arg) @safe {
-        auto a = this.arrayNoRef;
+        auto a = this.ArrayNoRef;
         static if(isArray!T) {
-            return DTree(a ~ DTree(arg).arrayNoRef);
+            return DTree(a ~ DTree(arg).ArrayNoRef);
         } else static if(is(T : DTree)) {
-            return DTree(a ~ arg.arrayNoRef);
+            return DTree(a ~ arg.ArrayNoRef);
         } else {
             static assert(false, "argument is not an Array or a DTree Array");
         }
     }
 
     void opOpAssign(string op : "~", T)(T arg) @safe {
-        auto a = this.arrayNoRef;
+        auto a = this.ArrayNoRef;
         static if(isArray!T) {
-            a ~= DTree(arg).arrayNoRef;
+            a ~= DTree(arg).ArrayNoRef;
         } else static if(is(T : DTree)) {
-            a ~= arg.arrayNoRef;
+            a ~= arg.ArrayNoRef;
         } else {
             static assert(false, "argument is not an Array or a DTree Array");
         }
@@ -499,7 +499,7 @@ struct DTree {
      * is not $(D Object).
      */
     auto opBinaryRight(string op : "in")(string k) const @safe {
-        return k in this.objectNoRef;
+        return k in this.ObjectNoRef;
     }
     ///
     unittest {
@@ -552,7 +552,7 @@ struct DTree {
 
     /// Implements the foreach $(D opApply) interface for json objects.
     int opApply(int delegate(string key, ref DTree) dg) @system {
-        enforce!DException(type == DType.Object, "DTree value is not an Object");
+        enforce!DException(_type == DType.Object, "DTree value is not an Object");
         int result;
 
         foreach(string key, ref value; Object) {
@@ -588,20 +588,20 @@ struct DTree {
             sep = "\n";
             tab = "  ";
         }
-        if (type == DType.Null){
+        if (_type == DType.Null){
             result = "null";
-        } else if (type == DType.Bool){
+        } else if (_type == DType.Bool){
             result = to!string(_value.Bool);
-        } else if (type == DType.String){
+        } else if (_type == DType.String){
             result = _value.String;
             /*if (!typed)*/ result = "\"" ~ result ~ "\"";
-        } else if (type == DType.Long){
+        } else if (_type == DType.Long){
             result = to!string(_value.Long);
-        } else if (type == DType.Ulong){
+        } else if (_type == DType.Ulong){
             result = to!string(_value.Ulong);
-        } else if (type == DType.Double){
+        } else if (_type == DType.Double){
             result = to!string(_value.Double);
-        } else if (type == DType.Object){
+        } else if (_type == DType.Object){
             auto keys = _value.Object.keys;
             import std.algorithm : sort;
             sort(keys);
@@ -612,7 +612,7 @@ struct DTree {
             }
             --depth;
             if (!typed) result = "(" ~ nl ~ tab.replicate(depth + 1) ~ result ~ nl ~ tab.replicate(depth) ~ ")" ;
-        } else if (type == DType.Array){
+        } else if (_type == DType.Array){
             ++depth;
             foreach (key, value; _value.Array) {
                 if (key > 0) result ~= sep ~ tab.replicate(depth);
@@ -635,9 +635,9 @@ struct DHandler {
     
     this(DConverter[] converters ...){
         import std.uni : toLower;
-        if (converters.length > 0) _format = toLower(converters[0].format);
+        if (converters.length > 0) _format = toLower(converters[0].Format);
         foreach (key, value; converters){
-            _converters[toLower(value.format)] = value;
+            _converters[toLower(value.Format)] = value;
         }
     }
     
@@ -646,11 +646,11 @@ struct DHandler {
         return toLower(format) in _converters;
     }
 
-    @property string defaultFormat() pure nothrow @safe @nogc {
+    @property string Format() pure nothrow @safe @nogc {
         return _format;
     }
 
-    @property string defaultFormat(string format){
+    @property string Format(string format){
         enforce!DException(hasConverter(format), "Converter " ~ format  ~ " doesn't exist!" );
         _format = toLower(format);
         return _format;
@@ -665,29 +665,29 @@ struct DHandler {
         return _converters[toLower(format)];
     }
     /// Value getter/setter for $(D DType.String).
-    /// Throws: $(D DException) for read access if $(D type) is not
+    /// Throws: $(D DException) for read access if $(D Type) is not
     /// $(D DType.String).
     
-    @property string toFormat() @trusted {
-        return _converters[_format].toFormat(tree);
+    @property string Output() @trusted {
+        return _converters[_format].Output(tree);
     }
 
-    @property string toFormat(string format) @trusted {
+    @property string Output(string format) @trusted {
         enforce!DException(hasConverter(format), "Converter " ~ format  ~ " doesn't exist!" );
-        return _converters[toLower(format)].toFormat(tree);
+        return _converters[toLower(format)].Output(tree);
     }
 
-    @property string toPrettyFormat() @trusted {
-        return _converters[_format].toPrettyFormat(tree);
+    @property string PrettyOutput() @trusted {
+        return _converters[_format].PrettyOutput(tree);
     }
     
-    @property string toPrettyFormat(string format) @trusted {
+    @property string PrettyOutput(string format) @trusted {
         enforce!DException(hasConverter(format), "Converter " ~ format  ~ " doesn't exist!" );
-        return _converters[toLower(format)].toPrettyFormat(tree);
+        return _converters[toLower(format)].PrettyOutput(tree);
     }
 
-    @property ref DHandler toTree(string str) {
-        tree = Converter.parse(str);
+    @property ref DHandler Parse(string str) {
+        tree = Converter.Parse(str);
         return this;
     }
     
@@ -727,7 +727,7 @@ class DException : Exception {
 unittest {
     import std.exception;
     DTree jv = "123";
-    assert(jv.type == DType.String);
+    assert(jv.Type == DType.String);
     assertNotThrown(jv.String);
     //assertThrown!DException(jv.Long);
     assertThrown!DException(jv.Ulong);
@@ -738,19 +738,19 @@ unittest {
     assertThrown!DException(jv[2]);
 
     jv = -3;
-    assert(jv.type == DType.Long);
+    assert(jv.Type == DType.Long);
     assertNotThrown(jv.Long);
 
     jv = cast(uint)3;
-    assert(jv.type == DType.Ulong);
+    assert(jv.Type == DType.Ulong);
     assertNotThrown(jv.Ulong);
 
     jv = 3.0f;
-    assert(jv.type == DType.Double);
+    assert(jv.Type == DType.Double);
     assertNotThrown(jv.Double);
 
     jv = ["key" : "value"];
-    assert(jv.type == DType.Object);
+    assert(jv.Type == DType.Object);
     assertNotThrown(jv.Object);
     assertNotThrown(jv["key"]);
     assert("key" in jv);
@@ -763,38 +763,38 @@ unittest {
     foreach(string key, value; jv) {
         static assert(is(typeof(value) == DTree));
         assert(key == "key");
-        assert(value.type == DType.String);
+        assert(value.Type == DType.String);
         assertNotThrown(value.String);
         assert(value.String == "value");
     }
 
     jv = [3, 4, 5];
-    assert(jv.type == DType.Array);
+    assert(jv.Type == DType.Array);
     assertNotThrown(jv.Array);
     assertNotThrown(jv[2]);
     foreach(size_t index, value; jv) {
         static assert(is(typeof(value) == DTree));
-        assert(value.type == DType.Long);
+        assert(value.Type == DType.Long);
         assertNotThrown(value.Long);
         assert(index == (value.Long-3));
     }
 
     jv = null;
-    assert(jv.type == DType.Null);
+    assert(jv.Type == DType.Null);
     assert(jv.isNull);
     jv = "foo";
     assert(!jv.isNull);
 
     jv = DTree("value");
-    assert(jv.type == DType.String);
+    assert(jv.Type == DType.String);
     assert(jv.String == "value");
 
     DTree jv2 = DTree("value");
-    assert(jv2.type == DType.String);
+    assert(jv2.Type == DType.String);
     assert(jv2.String == "value");
 
     DTree jv3 = DTree("\u001c");
-    assert(jv3.type == DType.String);
+    assert(jv3.Type == DType.String);
     assert(jv3.String == "\u001C");
 }
 
@@ -840,55 +840,55 @@ struct DConverter {
         return true;
     }
     
-    DTree parse(string jsonStr){
+    DTree Parse(string jsonStr){
         return _parse(jsonStr, _settings);
     }
     
-    string toFormat(DTree tree){
+    string Output(DTree tree){
         return _generate(tree, _settings);
     }
 
-    string toPrettyFormat(DTree tree){
-        set("pretty", SetTo(true));
+    string PrettyOutput(DTree tree){
+        Set("pretty", SetTo(true));
         string result = _generate(tree, _settings);
-        set("pretty", SetTo(false));
+        Set("pretty", SetTo(false));
         return result;
     }
 
     /// Value getter/setter for $(D DType.String).
-    /// Throws: $(D DException) for read access if $(D type) is not
+    /// Throws: $(D DException) for read access if $(D Type) is not
     /// $(D DType.String).
-    @property ref SetTo[string] settings() pure @trusted {
+    @property ref SetTo[string] Settings() pure @trusted {
         return _settings;
     }
 
     /// ditto
-    ref SetTo[string] set() pure nothrow @nogc @safe {
+    ref SetTo[string] Set() pure nothrow @nogc @safe {
         _settings = _defaultSettings;
         return _settings;
     }
 
-    ref SetTo[string] set(SetTo[string] settings) {
+    ref SetTo[string] Set(SetTo[string] settings) {
         _concArgs(settings);
         return _settings;
     }
 
-    ref SetTo set(string key, SetTo setting) {
-        enforce!DException(key in settings, "Key " ~ key ~ " doesn't exist!" );
+    ref SetTo Set(string key, SetTo setting) {
+        enforce!DException(key in _settings, "Key " ~ key ~ " doesn't exist!" );
         _settings[key] = setting;
         return _settings[key];
     }
 
-    ref SetTo[string] get() pure @safe {
+    ref SetTo[string] Get() pure @safe {
         return _settings;
     }
 
-    ref SetTo get(string key) pure @safe {
+    ref SetTo Get(string key) pure @safe {
         enforce!DException(key == "", "Key " ~ key ~ " doesn't exist!" );
         return _settings[key];
     }
 
-    @property string format() const pure nothrow @safe @nogc {
+    @property string Format() const pure nothrow @safe @nogc {
         return _format;
     } 
     
@@ -1232,19 +1232,19 @@ DTree parseJSON(T)(T json, int maxDepth = -1, DOptions options = DOptions.none) 
 
 unittest {
     enum issue15742objectOfObject = `{ "key1": { "key2": 1 }}`;
-    static assert(parseJSON(issue15742objectOfObject).type == DType.Object);
+    static assert(parseJSON(issue15742objectOfObject).Type == DType.Object);
 
     enum issue15742arrayOfArray = `[[1]]`;
-    static assert(parseJSON(issue15742arrayOfArray).type == DType.Array);
+    static assert(parseJSON(issue15742arrayOfArray).Type == DType.Array);
 }
 
 //unittest { import std.stdio; writeln("1 Testestest!!!!!"); } // Test
 unittest { 
     auto a = parseJSON(`{ "key1": { "key2": 1 }}`);
 //    writeln(`a["key1"] => `, a["key1"]);
-//    writeln(`a["key1"].type => `, a["key1"].type);
+//    writeln(`a["key1"].Type => `, a["key1"].Type);
 //    writeln(`a["key1"]["key2"] => `, a["key1"]["key2"]);
-//    writeln(`a["key1"]["key2"].type => `, a["key1"]["key2"].type);
+//    writeln(`a["key1"]["key2"].Type => `, a["key1"]["key2"].Type);
 //    writeln(`a["key1"]["key2"].Long => `, a["key1"]["key2"].Long);
 //    assert(a.toString == `(key1:(key2:1))`);
 //    assert(toJSON(a) ==`{"key1":{"key2":1}}`);  // +Long
@@ -1337,9 +1337,9 @@ string toJSON(const ref DTree root, in bool pretty = false, in DOptions options 
             putEOL();
         }
 
-        final switch(tree.type) {
+        final switch(tree.Type) {
             case DType.Object:
-                auto obj = tree.objectNoRef;
+                auto obj = tree.ObjectNoRef;
                 if(!obj.length) {
                     json.put("{}");
                 } else {
@@ -1381,7 +1381,7 @@ string toJSON(const ref DTree root, in bool pretty = false, in DOptions options 
                 break;
 
             case DType.Array:
-                auto arr = tree.arrayNoRef;
+                auto arr = tree.ArrayNoRef;
                 if(arr.empty) {
                     json.put("[]");
                 } else {
@@ -1471,41 +1471,41 @@ unittest {
     // Bugzilla 11504
 
     DTree jv = 1;
-    assert(jv.type == DType.Long);
+    assert(jv.Type == DType.Long);
 
     jv.String = "123";
-    assert(jv.type == DType.String);
+    assert(jv.Type == DType.String);
     assert(jv.String == "123");
 
     jv.Long = 1;
-    assert(jv.type == DType.Long);
+    assert(jv.Type == DType.Long);
     assert(jv.Long == 1);
 
     jv.Ulong = 2u;
-    assert(jv.type == DType.Ulong);
+    assert(jv.Type == DType.Ulong);
     assert(jv.Ulong == 2u);
 
     jv.Double = 1.5f;
-    assert(jv.type == DType.Double);
+    assert(jv.Type == DType.Double);
     assert(jv.Double == 1.5f);
 
     jv.Object = ["key" : DTree("value")];
-    assert(jv.type == DType.Object);
+    assert(jv.Type == DType.Object);
     assert(jv.Object == ["key" : DTree("value")]);
 
     jv.Array = [DTree(1), DTree(2), DTree(3)];
-    assert(jv.type == DType.Array);
+    assert(jv.Type == DType.Array);
     assert(jv.Array == [DTree(1), DTree(2), DTree(3)]);
 
     jv = true;
-    assert(jv.type == DType.Bool);
+    assert(jv.Type == DType.Bool);
 
     jv = false;
-    assert(jv.type == DType.Bool);
+    assert(jv.Type == DType.Bool);
 
     enum E{True = true}
     jv = E.True;
-    assert(jv.type == DType.Bool);
+    assert(jv.Type == DType.Bool);
 }
 
 pure unittest {
@@ -1626,8 +1626,8 @@ unittest {
   auto json = `"hello\nworld"`;
   auto jc = JSONConv();
   auto tree = parseJSON(json);
-  assert(jc.toFormat(tree) == json);
-  assert(jc.toPrettyFormat(tree) == json);
+  assert(jc.Output(tree) == json);
+  assert(jc.PrettyOutput(tree) == json);
 }
 
 pure unittest {
@@ -1636,26 +1636,26 @@ pure unittest {
     DTree jv;
     jv["int"] = 123;
 
-    assert(jv.type == DType.Object);
+    assert(jv.Type == DType.Object);
     assert("int" in jv);
     assert(jv["int"].Long == 123);  // +Long
 
     jv["Array"] = [1, 2, 3, 4, 5];
 
-    assert(jv["Array"].type == DType.Array);
+    assert(jv["Array"].Type == DType.Array);
     assert(jv["Array"][2].Long == 3); // +Long
 
     jv["String"] = "D language";
-    assert(jv["String"].type == DType.String);
+    assert(jv["String"].Type == DType.String);
     assert(jv["String"].String == "D language");
 
     jv["bool"] = false;
-    assert(jv["bool"].type == DType.Bool);
+    assert(jv["bool"].Type == DType.Bool);
 
     assert(jv.Object.length == 4);
 
     jv = [5, 4, 3, 2, 1];
-    assert( jv.type == DType.Array );
+    assert( jv.Type == DType.Array );
     assert( jv[3].Long == 2 );  // +Long
 }
 
@@ -1688,16 +1688,16 @@ unittest {
     }
     auto jh = DHandler(JSONConv);
     // with the specialFloatLiterals option, encode NaN/Inf as strings
-    jh.Converter.set("dOptions", SetTo(DOptions.specialFloatLiterals));
-    assert(jh.Tree(float.nan).toFormat()       == nanString);
-    assert(jh.Tree(double.infinity).toFormat() == infString);
-    assert(jh.Tree(-real.infinity).toFormat()  == negativeInfString);
+    jh.Converter.Set("dOptions", SetTo(DOptions.specialFloatLiterals));
+    assert(jh.Tree(float.nan).Output       == nanString);
+    assert(jh.Tree(double.infinity).Output == infString);
+    assert(jh.Tree(-real.infinity).Output  == negativeInfString);
 
     // without the specialFloatLiterals option, throw on encoding NaN/Inf
-    jh.Converter.set("dOptions", SetTo(DOptions.none));
-    assertThrown!DException(jh.Tree(float.nan).toFormat);
-    assertThrown!DException(jh.Tree(double.infinity).toFormat);
-    assertThrown!DException(jh.Tree(-real.infinity).toFormat);
+    jh.Converter.Set("dOptions", SetTo(DOptions.none));
+    assertThrown!DException(jh.Tree(float.nan).Output);
+    assertThrown!DException(jh.Tree(double.infinity).Output);
+    assertThrown!DException(jh.Tree(-real.infinity).Output);
 
     // when parsing json with specialFloatLiterals option, decode special strings as floats
     DTree jvNan    = parseJSON(nanString, DOptions.specialFloatLiterals);

@@ -13,7 +13,7 @@ int main(string[] args) {
         varArr["du"] = 2;
         varArr["trys"] = [3];
         foreach (key, value; varArr){
-            if (value.type == typeid(string)){
+            if (value.Type == typeid(string)){
                 writeln("varArr[\"", key, "\"] => \"", value, "\"");
             } else {
                 writeln("varArr[\"", key, "\"] => ", value);
@@ -30,50 +30,50 @@ int main(string[] args) {
     //tree_null = DTree(null);
     tree_null.value = null;
     writeln("tree_null.value = ", tree_null.value);
-    writeln("tree_null.value.type = ", tree_null.value.type);
-    writeln("tree_null.type = ", tree_null.type);
+    writeln("tree_null.value.Type = ", tree_null.value.Type);
+    writeln("tree_null.Type = ", tree_null.Type);
     writeln();
      
     //tree_bool = DTree(true);
     tree_bool.value = true;
     writeln("tree_bool.value = ", tree_bool.value);
-    writeln("tree_bool.value.type = ", tree_bool.value.type);
-    writeln("tree_bool.type = ", tree_bool.type);
+    writeln("tree_bool.value.Type = ", tree_bool.value.Type);
+    writeln("tree_bool.Type = ", tree_bool.Type);
     writeln();
     
     //tree_str = DTree("eilutė");
     tree_str.value = "eilutė";
     writeln("tree_str.value = ", tree_str.value);
-    writeln("tree_str.value.type = ", tree_str.value.type);
-    writeln("tree_str.type = ", tree_str.type);
+    writeln("tree_str.value.Type = ", tree_str.value.Type);
+    writeln("tree_str.Type = ", tree_str.Type);
     writeln();
     
     //tree_long = DTree(11234569L);
     tree_long.value = 11234569L;
     writeln("tree_long.value = ", tree_long.value);
-    writeln("tree_long.value.type = ", tree_long.value.type);
-    writeln("tree_long.type = ", tree_long.type);
+    writeln("tree_long.value.Type = ", tree_long.value.Type);
+    writeln("tree_long.Type = ", tree_long.Type);
     writeln();
     
     //tree_double = DTree(1.14569);
     tree_double.value = 1.14569;
     writeln("tree_double.value = ", tree_double.value);
-    writeln("tree_double.value.type = ", tree_double.value.type);
-    writeln("tree_double.type = ", tree_double.type);
+    writeln("tree_double.value.Type = ", tree_double.value.Type);
+    writeln("tree_double.Type = ", tree_double.Type);
     writeln();
 
     //tree_darray = DTree([tree_str, tree_long, tree_double]);
     tree_darray.value = [tree_str, tree_long, tree_double];
     writeln("tree_darray.value = ", tree_darray.value);
-    writeln("tree_darray.value.type = ", tree_darray.value.type);
-    writeln("tree_darray.type = ", tree_darray.type);
+    writeln("tree_darray.value.Type = ", tree_darray.value.Type);
+    writeln("tree_darray.Type = ", tree_darray.Type);
     writeln();
     
     //tree_dobject = DTree(["string" : tree_str, "long" : tree_long, "double" : tree_double, "darray" : tree_darray]);
     tree_dobject.value = ["string" : tree_str, "long" : tree_long, "double" : tree_double, "darray" : tree_darray];
     writeln("tree_dobject.value = ", tree_dobject.value);
-    writeln("tree_dobject.value.type = ", tree_dobject.value.type);
-    writeln("tree_dobject.type = ", tree_dobject.type);
+    writeln("tree_dobject.value.Type = ", tree_dobject.value.Type);
+    writeln("tree_dobject.Type = ", tree_dobject.Type);
     writeln();
  */ 
  /**/
@@ -83,41 +83,43 @@ int main(string[] args) {
     //writeln("typeid(\"abc\") => ", typeid("abc"));
     //writeln("typeid(null) => ", typeid(null).toString);
     
+    auto dHandler = DHandler(JSONConv);
+    writeln("dHandler.Tree(15U).Type => ", dHandler.Tree(15U).Type);
     string jsonStr = q"/
         { "numbers" : [9, 1955.3], "language": {"a" : "D"} , "names" : ["Jonas", "Petras"], "mix" : ["abc", 123 ] }
     /";
     writeln("jsonStr => ", jsonStr);
-    auto dHandler = DHandler(JSONConv);
 
  /*     tree_json.value = json.toDTree(jsonStr);
     writeln("tree_json.value => ", tree_json.value);
-    writeln("tree_json.value.type => ", tree_json.value.type);
-    writeln("tree_json.type => ", tree_json.type);
-    writeln("tree_json.type == typeid(DTree[string]) => ", tree_json.type == typeid(DTree[string]));
+    writeln("tree_json.value.Type => ", tree_json.value.Type);
+    writeln("tree_json.Type => ", tree_json.Type);
+    writeln("tree_json.Type == typeid(DTree[string]) => ", tree_json.Type == typeid(DTree[string]));
     writeln();
  */    
     //dHandler.tree(jsonStr);
     dHandler.String = jsonStr;
-    writeln("dHandler.toTree(jsonStr).toFormat => ", dHandler.toTree(jsonStr).toFormat);
+    writeln("dHandler.Parse(jsonStr).Output => ", dHandler.Parse(jsonStr).Output);
     writeln("dHandler => ", dHandler);
     auto obj = dHandler.tree.Object;
+    writeln("dHandler.tree.toString => \n", dHandler.tree.toString, "\n");
     writeln("dHandler.tree.toString(false, false) => \n", dHandler.tree.toString(false, false), "\n");
     writeln("dHandler.tree.toString(true, false) => \n", dHandler.tree.toString(true, false), "\n");
     writeln("dHandler.tree.toString(false, true) => \n", dHandler.tree.toString(false, true), "\n");
     writeln("dHandler.tree.toString(true, true) => \n", dHandler.tree.toString(true, true), "\n");
     //writeln("dHandler.tree.value => ", dHandler.tree.value);
-    //writeln("dHandler.tree.value.type => ", dHandler.tree.value.type);
-    //writeln("dHandler.tree.type => ", dHandler.tree.type);
-    writeln(`dHandler.defaultFormat => `, dHandler.defaultFormat);
-    writeln(`dHandler.Converter().format => `, dHandler.Converter().format);
-    auto conv = dHandler.Converter();
+    //writeln("dHandler.tree.value.Type => ", dHandler.tree.value.Type);
+    //writeln("dHandler.tree.Type => ", dHandler.tree.Type);
+    writeln(`dHandler.Format => `, dHandler.Format);
+    writeln(`dHandler.Converter.Format => `, dHandler.Converter.Format);
+    auto conv = dHandler.Converter;
     writeln();
-    writeln(`dHandler.defaultFormat("json") => `, dHandler.defaultFormat("json"));
-    writeln("dHandler.type => ", dHandler.type);
+    writeln(`dHandler.Format("json") => `, dHandler.Format("json"));
+    writeln("dHandler.Type => ", dHandler.Type);
     writeln("dHandler.tree => ", dHandler.tree);
     writeln();
 
-    writeln("dHandler.toFormat => ", dHandler.toFormat); 
+    writeln("dHandler.Output => ", dHandler.Output); 
     //writeln("dHandler.set([\"pretty\" : SetTo(true)];");
     //dHandler.set(["pretty" : SetTo(true)]);
     write("dHandler.set(\"pretty\", SetTo(true)) => ");
@@ -132,18 +134,18 @@ int main(string[] args) {
 /*     //tree_dobject = DTree(["string" : tree_str, "long" : tree_long, "double" : tree_double, "darray" : tree_darray]);
     tree_dobject.value = ["string" : tree_str, "long" : tree_long, "double" : tree_double, "darray" : tree_darray];
     writeln("tree_dobject.value = ", tree_dobject.value);
-    writeln("tree_dobject.value.type = ", tree_dobject.value.type);
-    writeln("tree_dobject.type = ", tree_dobject.type);
+    writeln("tree_dobject.value.Type = ", tree_dobject.value.Type);
+    writeln("tree_dobject.Type = ", tree_dobject.Type);
     writeln();
  */
 /*     tree_array = DTree([1, 2, 3]);
     writeln("tree_array.value = ", tree_array.value);
-    writeln("tree_array.value.type = ", tree_array.value.type);
+    writeln("tree_array.value.Type = ", tree_array.value.Type);
     writeln();
 
     tree_darray = DTree([tree_str, tree_long, tree_double]);
     writeln("tree_darray.value = ", tree_darray.value);
-    writeln("tree_darray.value.type = ", tree_darray.value.type);
+    writeln("tree_darray.value.Type = ", tree_darray.value.Type);
     writeln();
 
     
@@ -159,9 +161,9 @@ int main(string[] args) {
 
     store = [Store(5), Store(17), Store("20")];
     writeln("store = ", store);
-    writeln("store.type = ", store.type);
-    writeln("store[0].type = ", store[0].type);
-    writeln("store[2].type = ", store[2].type);
+    writeln("store.Type = ", store.Type);
+    writeln("store[0].Type = ", store[0].Type);
+    writeln("store[2].Type = ", store[2].Type);
 
     store = 5;
     writeln("store = ", store);
@@ -229,10 +231,10 @@ int main(string[] args) {
 /*     // j and j["language"] return JSONValue,
     // j["language"].str returns a string
 
-    //check a type
+    //check a Type
     long x;
     if (const(JSONValue)* code = "code" in tree.value){
-        if (code.type() == JSON_TYPE.INTEGER){
+        if (code.Type() == JSON_TYPE.INTEGER){
             x = code.integer;
         } else {
             x = to!int(code.str);
