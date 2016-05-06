@@ -55,4 +55,4 @@ $ => Array(Long(1); Long(2); Long(3))
 tree.Object = ["a" : 1, "b" : 2, "c" : 3]; 
 writeln(tree.toString(PrettyTyped)); 
 $ => Object(a: Long(1); b: Long(2); c: Long(3))
-```D
+```
