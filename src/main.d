@@ -7,24 +7,36 @@ int main(string[] args) {
 
     writefln("\nFile %s is running.\n", args[0]);
 
-/*     void test() {
-        Variant[string] varArr;
-        varArr["vienas"] = "v";
-        varArr["du"] = 2;
-        varArr["trys"] = [3];
-        foreach (key, value; varArr){
-            if (value.Type == typeid(string)){
-                writeln("varArr[\"", key, "\"] => \"", value, "\"");
-            } else {
-                writeln("varArr[\"", key, "\"] => ", value);
-            }
-        }
-    }
-    
-    //test();
-    
-    writeln("long.max => ", long.max);
- */    
+    DTree tree;
+
+    tree = true; 
+    writeln(tree.toString(cTyped)); 
+    writeln(tree.Bool == true); 
+
+    tree = "abc"; 
+    writeln(tree.toString(cTyped)); 
+    writeln(tree.String == "abc"); 
+
+    tree = 11L; 
+    writeln(tree.toString(cTyped)); 
+    writeln(tree.Long == 11L); 
+
+    tree = 20UL; 
+    writeln(tree.toString(cTyped)); 
+    writeln(tree.Ulong == 20UL); 
+
+    tree = 1.23; 
+    writeln(tree.toString(cTyped)); 
+    writeln(tree.Double == 1.23); 
+
+    tree = [1, 2, 3]; 
+    writeln(tree.toString(cTyped)); 
+    writeln(tree.Array == [DTree(1), DTree(2), DTree(3)]); 
+
+    tree = ["a" : 1, "b" : 2, "c" : 3]; 
+    writeln(tree.toString(cTyped)); 
+    writeln(tree.Object == ["a" : DTree(1), "b" : DTree(2), "c" : DTree(3)]); 
+
     DTree tree_null, tree_bool, tree_str, tree_long, tree_double, tree_array, tree_darray, tree_dobject, tree_json;
 /*    
     //tree_null = DTree(null);
@@ -84,6 +96,7 @@ int main(string[] args) {
     //writeln("typeid(null) => ", typeid(null).toString);
     
     auto dHandler = DHandler(JSONConv);
+    
     writeln("dHandler.Tree(15U).Type => ", dHandler.Tree(15U).Type);
     string jsonStr = q"/
         { "numbers" : [9, 1955.3], "language": {"a" : "D"} , "names" : ["Jonas", "Petras"], "mix" : ["abc", 123 ] }
@@ -103,10 +116,10 @@ int main(string[] args) {
     writeln("dHandler => ", dHandler);
     auto obj = dHandler.tree.Object;
     writeln("dHandler.tree.toString => \n", dHandler.tree.toString, "\n");
-    writeln("dHandler.tree.toString(false, false) => \n", dHandler.tree.toString(false, false), "\n");
-    writeln("dHandler.tree.toString(true, false) => \n", dHandler.tree.toString(true, false), "\n");
-    writeln("dHandler.tree.toString(false, true) => \n", dHandler.tree.toString(false, true), "\n");
-    writeln("dHandler.tree.toString(true, true) => \n", dHandler.tree.toString(true, true), "\n");
+    writeln("dHandler.tree.toString(0) => \n", dHandler.tree.toString(0), "\n");
+    writeln("dHandler.tree.toString(cPretty) => \n", dHandler.tree.toString(cPretty), "\n");
+    writeln("dHandler.tree.toString(cTyped) => \n", dHandler.tree.toString(cTyped), "\n");
+    writeln("dHandler.tree.toString(cPrettyTyped) => \n", dHandler.tree.toString(cPrettyTyped), "\n");
     //writeln("dHandler.tree.value => ", dHandler.tree.value);
     //writeln("dHandler.tree.value.Type => ", dHandler.tree.value.Type);
     //writeln("dHandler.tree.Type => ", dHandler.tree.Type);

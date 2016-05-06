@@ -76,6 +76,8 @@ enum DOptions {
     specialFloatLiterals = 0x1, /// encode NaN and Inf float values as strings
 }
 
+enum {cPretty = 1, cTyped, cPrettyTyped}
+
 alias SetTo  = Algebraic!(bool, int, uint, long, ulong, string, DOptions);
 
 /**
@@ -567,8 +569,8 @@ struct DTree {
     /// Implicitly calls $(D toJSON) on this DTree.
     ///
     /// $(I options) can be used to tweak the conversion behavior.
-    string toString(in bool typed = false, in bool pretty = false) const @safe {
-        return _output(typed, pretty);
+    string toString(byte opt = 0) const @safe {
+        return _output(opt == 1 || opt == 3, opt > 1);
     }
 
 /*     /// Implicitly calls $(D toJSON) on this DTree, like $(D toString), but
@@ -579,9 +581,9 @@ struct DTree {
         return toJSON(this, true, options);
     }
  */    
-    private string _output(in bool typed = false, in bool pretty = false, int depth = 0) const @trusted {
+    private string _output(bool pretty = false, bool typed = false, int depth = 0) const @trusted {
         string result;
-        string space = ""; string nl = ""; string sep = ";"; string tab = ""; 
+        string space = ""; string nl = ""; string sep = ";"; string tab = "";
         if (pretty){
             space = " ";
             nl = "\n";
@@ -608,7 +610,7 @@ struct DTree {
             ++depth;
             foreach (i, key; keys) {
                 if (i > 0) result ~= sep ~ tab.replicate(depth);
-                result ~= key ~ ":" ~ space ~ _value.Object[key]._output(typed, pretty, depth);
+                result ~= key ~ ":" ~ space ~ _value.Object[key]._output(pretty, typed, depth);
             }
             --depth;
             if (!typed) result = "(" ~ nl ~ tab.replicate(depth + 1) ~ result ~ nl ~ tab.replicate(depth) ~ ")" ;
@@ -616,7 +618,7 @@ struct DTree {
             ++depth;
             foreach (key, value; _value.Array) {
                 if (key > 0) result ~= sep ~ tab.replicate(depth);
-                result ~= value._output(typed, pretty, depth);
+                result ~= value._output(pretty, typed, depth);
             }
             --depth;
             if (!typed) result = "(" ~ nl ~ tab.replicate(depth + 1) ~ result ~ nl ~ tab.replicate(depth) ~ ")";
