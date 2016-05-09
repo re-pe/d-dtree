@@ -10,12 +10,14 @@ auto treeUlong = DTree(1U);
 auto treeDouble = DTree(1.1);
 auto treeArray = DTree([1, 2, 3]);
 auto treeObject = DTree(["a" : 1, "b" : 2]);
+auto treeMixed = DTree("a", 3.45, DTree(10, "oho"), ["key0" : DTree("value"), "key1" : DTree(1000)]);
 ```
 ##### Creating of dtree by cloning and assigning existing tree structure:
 ```D
 auto newTree = tree("first tree");
+assert(tree == newTree);
 assert(&tree != &newTree);
-newTree("second tree");
+newTree("new content");
 assert(tree != newTree);
 ```
 ### 2. Getting values and types of values
