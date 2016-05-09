@@ -1,2 +1,2 @@
 @echo off
-rdmd -de -w -unittest _exp/_exp_args.d %*
+rdmd -de -w -unittest _exper/_exp_args.d %*
