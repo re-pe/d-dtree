@@ -44,12 +44,13 @@ newTree = "abc";
 newTree = 100;
 newTree = 15U;
 newTree = 3.45159;
+newTree = DTree(true, 7, "piece of text");
 newTree = [DTree(true), DTree(7), DTree("piece of text")];
 newTree = ["a" : DTree(7), "b" : DTree("this is string")];
 ```
 ##### Alias of DTree
 ```D
-newTree = _(null, tree, "abc", _(15, "text"), _(["long" : -15, "array" : _("1", 2U, 3.45)]))
+newTree = _(null, tree, "abc", _(15, "text"), _(["long" : _(-15), "array" : _("1", 2U, 3.45)]))
 ```
 ##### Setting new value by calling:
 ```D
