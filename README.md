@@ -1,4 +1,4 @@
-## d-dtree
+## dtree in D language
 Tool for working with semi-structured data like json or xml in D programming language. Based on std.json
 ### 1. Creating of dtree:
 ##### Creating of dtree with constructor:
