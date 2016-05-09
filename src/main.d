@@ -75,7 +75,10 @@ assert(tree(["a" : 1, "b" : 2, "c" : 3]).toString == `Object(a:Long(1);b:Long(2)
 
 DTree.settings.typed = false;
 
-auto test = _(
+auto test = DTree("a", 3.45, DTree(10, "oho"), ["key0" : DTree("value"), "key1" : DTree(1000)]);
+assert(test.toString == `("a";3.45;(10;"oho");(key0:"value";key1:1000))`);
+
+test = _(
     null, true, -1, -1L, 1U, 1UL, 1.1, "abc", 
     _(
         null, true, -1, -1L, 1U, 1UL, 1.1, "abc", 
@@ -84,10 +87,10 @@ auto test = _(
 ); 
 
 assert(test.toString == `(null;true;-1;-1;1;1;1.1;"abc";(null;true;-1;-1;1;1;1.1;"abc";(a:"def")))`);
-
 DTree.settings.typed = true;
 assert(test.toString == 
 `Array(Null(null);Bool(true);Long(-1);Long(-1);Ulong(1);Ulong(1);Double(1.1);String("abc");Array(Null(null);Bool(true);Long(-1);Long(-1);Ulong(1);Ulong(1);Double(1.1);String("abc");Object(a:String("def"))))`);
+
 
 writeln("End test");
     

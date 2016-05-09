@@ -382,6 +382,7 @@ struct DTree {
             _value = result[0]._value;
             _type  = result[0]._type;
         } 
+        //_assign(args);
     }
     
     unittest {
@@ -395,12 +396,23 @@ struct DTree {
         assert(j.Type == DType.Object);
     }
 
-    ref DTree opCall(T)(T[] args ...){
-        _assign(args);
+    ref DTree opCall(T...)(T args) {
+        DTree[] result = new DTree[args.length];
+        foreach (key, value; args){
+            result[key] = value;
+        }
+        
+        if (result.length > 1) {
+            _value = DTree(result)._value;
+            _type  = DTree(result)._type;
+        } else if (result.length > 0){
+            _value = result[0]._value;
+            _type  = result[0]._type;
+        }
         return this;
     }
     
-    ref DTree opCall(T)(T arg) if(!isStaticArray!T) {
+/*     ref DTree opCall(T)(T arg) if(!isStaticArray!T) {
         _assign(arg);
         return this;
     }
@@ -409,7 +421,7 @@ struct DTree {
         _assignRef(arg);
         return this;
     }
-
+ */
     
     void opAssign(T)(T arg) if(!isStaticArray!T && !is(T : DTree)) {
         _assign(arg);
