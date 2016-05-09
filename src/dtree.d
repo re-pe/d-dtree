@@ -26,9 +26,9 @@ Synopsis:
 
     // create a json struct
     DTree jj = [ "language": "D" ];
-    // rating doesnt exist yet, so use .Object to assign
+    // rating doesnt exist yet, so use .Object to _assign
     jj.Object["rating"] = DTree(3.14);
-    // create an Array to assign to list
+    // create an Array to _assign to list
     jj.Object["list"] = DTree( ["a", "b", "c"] );
     // list already exists, so .Object optional
     jj["list"].Array ~= DTree("D");
@@ -76,8 +76,6 @@ enum DOptions {
     specialFloatLiterals = 0x1, /// encode NaN and Inf float values as strings
 }
 
-enum {cPretty = 1, cTyped, cPrettyTyped}
-
 alias SetTo  = Algebraic!(bool, int, uint, long, ulong, string, DOptions);
 
 /**
@@ -97,6 +95,8 @@ enum DType : string {
 /**
 JSON value node
 */
+
+alias  DTree _;
 struct DTree {
 
     union DValue {
@@ -108,6 +108,9 @@ struct DTree {
         DTree[string]               Object;
         DTree[]                     Array;
     }
+    import std.typecons;
+    static auto settings = tuple!("pretty", "typed")(false, false);
+    
     private DValue _value;
     private DType  _type = DType.Null;
 
@@ -134,7 +137,7 @@ struct DTree {
     }
     /// ditto
     @property bool Bool(bool v) pure nothrow @nogc @safe {
-        assign(v);
+        _assign(v);
         return v;
     }
     ///
@@ -158,7 +161,7 @@ struct DTree {
     }
     /// ditto
     @property string String(string v) pure nothrow @nogc @safe {
-        assign(v);
+        _assign(v);
         return v;
     }
     ///
@@ -182,7 +185,7 @@ struct DTree {
     }
     /// ditto
     @property long Long(long v) pure nothrow @safe @nogc {
-        assign(v);
+        _assign(v);
         return _value.Long;
     }
 
@@ -195,7 +198,7 @@ struct DTree {
     }
     /// ditto
     @property ulong Ulong(ulong v) pure nothrow @safe @nogc {
-        assign(v);
+        _assign(v);
         return _value.Ulong;
     }
 
@@ -208,7 +211,7 @@ struct DTree {
     }
     /// ditto
     @property double Double(double v) pure nothrow @safe @nogc {
-        assign(v);
+        _assign(v);
         return _value.Double;
     }
 
@@ -228,7 +231,7 @@ struct DTree {
     }
     /// ditto
     @property DTree[string] Object(DTree[string] v) pure nothrow @nogc @safe {
-        assign(v);
+        _assign(v);
         return v;
     }
 
@@ -266,7 +269,7 @@ struct DTree {
     }
     /// ditto
     @property DTree[] Array(DTree[] v) pure nothrow @nogc @safe {
-        assign(v);
+        _assign(v);
         return v;
     }
 
@@ -294,7 +297,7 @@ struct DTree {
         return _type == DType.Null;
     }
 
-    private void assign(T)(T arg) @safe {
+    private void _assign(T)(T arg) @safe {
         static if(is(T : typeof(null))) {
             _type = DType.Null;
             //_value = DValue();
@@ -342,7 +345,7 @@ struct DTree {
         }
     }
 
-    private void assignRef(T)(ref T arg) if(isStaticArray!T) {
+    private void _assignRef(T)(ref T arg) if(isStaticArray!T) {
         _type = DType.Array;
         static if(is(ElementEncodingType!T : DTree)) {
             _value.Array = arg;
@@ -366,19 +369,21 @@ struct DTree {
      * and $(D K) i.e. a JSON Object, any Array or $(D bool). The Type will
      * be set accordingly.
     */
-    this(T)(T arg) if(!isStaticArray!T) {
-        assign(arg);
+    this(T...)(T args) {
+        DTree[] result = new DTree[args.length];
+        foreach (key, value; args){
+            result[key] = value;
+        }
+        
+        if (result.length > 1) {
+            _value = DTree(result)._value;
+            _type  = DTree(result)._type;
+        } else if (result.length > 0){
+            _value = result[0]._value;
+            _type  = result[0]._type;
+        } 
     }
-    /// Ditto
-    this(T)(ref T arg) if(isStaticArray!T) {
-        assignRef(arg);
-    }
-    /// Ditto
-    this(T : DTree)(inout T arg) inout {
-        _value = arg._value;
-        _type = arg._type;
-    }
-    ///
+    
     unittest {
         DTree j = DTree( "a string" );
         j = DTree(42);
@@ -390,12 +395,28 @@ struct DTree {
         assert(j.Type == DType.Object);
     }
 
+    ref DTree opCall(T)(T[] args ...){
+        _assign(args);
+        return this;
+    }
+    
+    ref DTree opCall(T)(T arg) if(!isStaticArray!T) {
+        _assign(arg);
+        return this;
+    }
+    /// Ditto
+    ref DTree opCall(T)(ref T arg) if(isStaticArray!T) {
+        _assignRef(arg);
+        return this;
+    }
+
+    
     void opAssign(T)(T arg) if(!isStaticArray!T && !is(T : DTree)) {
-        assign(arg);
+        _assign(arg);
     }
 
     void opAssign(T)(ref T arg) if(isStaticArray!T) {
-        assignRef(arg);
+        _assignRef(arg);
     }
 
     /// Array syntax for json arrays.
@@ -569,8 +590,8 @@ struct DTree {
     /// Implicitly calls $(D toJSON) on this DTree.
     ///
     /// $(I options) can be used to tweak the conversion behavior.
-    string toString(byte opt = 0) const @safe {
-        return _output(opt == 1 || opt == 3, opt > 1);
+    string toString() const @safe {
+        return _output(settings.pretty, settings.typed);
     }
 
 /*     /// Implicitly calls $(D toJSON) on this DTree, like $(D toString), but

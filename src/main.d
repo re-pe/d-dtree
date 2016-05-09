@@ -1,41 +1,130 @@
 import std.stdio;
 import std.variant;
+import std.typecons;
 import dtree;
 //import djson;
 
 int main(string[] args) {
 
     writefln("\nFile %s is running.\n", args[0]);
+    writeln();
 
-    DTree tree;
+writeln("Begin test");
 
-    tree = true; 
-    writeln(tree.toString(cTyped)); 
-    writeln(tree.Bool == true); 
+DTree tree;
 
-    tree = "abc"; 
-    writeln(tree.toString(cTyped)); 
-    writeln(tree.String == "abc"); 
+auto newTree = tree("first tree");
+assert(&tree != &newTree);
+newTree("second tree");
+assert(tree != newTree);
 
-    tree = 11L; 
-    writeln(tree.toString(cTyped)); 
-    writeln(tree.Long == 11L); 
+newTree = true;
+newTree = "abc";
+newTree = 100;
+newTree = 15U;
+newTree = 3.45159;
+newTree = [DTree(true), DTree(7), DTree("piece of text")];
+newTree = ["a" : DTree(7), "b" : DTree("this is string")];
+newTree = tree;
 
-    tree = 20UL; 
-    writeln(tree.toString(cTyped)); 
-    writeln(tree.Ulong == 20UL); 
+auto anotherTree = tree;
+anotherTree(false);
+anotherTree("def");
+anotherTree(-19);
+anotherTree(7U);
+anotherTree(2.5);
+anotherTree([100, 200, 300]);
+anotherTree(["a" : 15, "b" : 26]);
+anotherTree(["a" : 15, "b" : 26]);
 
-    tree = 1.23; 
-    writeln(tree.toString(cTyped)); 
-    writeln(tree.Double == 1.23); 
+tree = [15, 16, 17];
+assert(tree[0] == DTree(15));
+assert(tree[1] == DTree(16));
+assert(tree[2] == DTree(17));
+tree = ["a" : 15, "b" : 16, "c" : 17];
+assert(tree["a"] == DTree(15));
+assert(tree["b"] == DTree(16));
+assert(tree["c"] == DTree(17));
 
-    tree = [1, 2, 3]; 
-    writeln(tree.toString(cTyped)); 
-    writeln(tree.Array == [DTree(1), DTree(2), DTree(3)]); 
+assert(tree(true).Bool == true); 
+assert(tree("abc").String == "abc"); 
+assert(tree(11L).Long == 11L); 
+assert(tree(20UL).Ulong == 20UL); 
+assert(tree(1.23).Double == 1.23); 
+assert(tree([1, 2, 3]).Array == [DTree(1), DTree(2), DTree(3)]); 
+assert(tree(["a" : 1, "b" : 2, "c" : 3]).Object == ["a" : DTree(1), "b" : DTree(2), "c" : DTree(3)]); 
 
-    tree = ["a" : 1, "b" : 2, "c" : 3]; 
-    writeln(tree.toString(cTyped)); 
-    writeln(tree.Object == ["a" : DTree(1), "b" : DTree(2), "c" : DTree(3)]); 
+assert(tree(true).toString == `true`); 
+assert(tree("abc").toString == `"abc"`); 
+assert(tree(11L).toString == `11`); 
+assert(tree(20UL).toString == `20`); 
+assert(tree(1.23).toString == `1.23`); 
+assert(tree([1, 2, 3]).toString == `(1;2;3)`); 
+assert(tree(["a" : 1, "b" : 2, "c" : 3]).toString == `(a:1;b:2;c:3)`); 
+
+
+DTree.settings.typed = true;
+
+assert(tree(true).toString      == `Bool(true)`); 
+assert(tree("abc").toString     == `String("abc")`); 
+assert(tree(11L).toString       == `Long(11)`); 
+assert(tree(20UL).toString      == `Ulong(20)`); 
+assert(tree(1.23).toString      == `Double(1.23)`); 
+assert(tree([1, 2, 3]).toString == `Array(Long(1);Long(2);Long(3))`); 
+assert(tree(["a" : 1, "b" : 2, "c" : 3]).toString == `Object(a:Long(1);b:Long(2);c:Long(3))`); 
+
+DTree.settings.typed = false;
+
+auto test = _(
+    null, true, -1, -1L, 1U, 1UL, 1.1, "abc", 
+    _(
+        null, true, -1, -1L, 1U, 1UL, 1.1, "abc", 
+        ["a": "def"]
+    )
+); 
+
+assert(test.toString == `(null;true;-1;-1;1;1;1.1;"abc";(null;true;-1;-1;1;1;1.1;"abc";(a:"def")))`);
+
+DTree.settings.typed = true;
+assert(test.toString == 
+`Array(Null(null);Bool(true);Long(-1);Long(-1);Ulong(1);Ulong(1);Double(1.1);String("abc");Array(Null(null);Bool(true);Long(-1);Long(-1);Ulong(1);Ulong(1);Double(1.1);String("abc");Object(a:String("def"))))`);
+
+writeln("End test");
+    
+    //DTree tree;
+
+    writeln("DTree.settings.typed = true"); DTree.settings.typed = true;
+    writeln();
+
+    write(`tree(true).Bool == true => `); writeln(tree(true).Bool == true); 
+    write(`tree.toString == Bool(true) => `); writeln(tree.toString == `Bool(true)`); 
+    writeln();
+    
+    write(`tree("abc").String == "abc" => `); writeln(tree("abc").String == "abc"); 
+    write(`tree.toString == String("abc") => `); writeln(tree.toString == `String("abc")`); 
+    writeln();
+
+    write(`tree(11L).Long == 11L => `); writeln(tree(11L).Long == 11L); 
+    write(`tree.toString => Long(11) => `); writeln(tree.toString == `Long(11)`); 
+    writeln();
+
+    write(`tree(20UL).Ulong == 20UL => `); writeln(tree(20UL).Ulong == 20UL); 
+    write(`tree.toString == Ulong(20) => `); writeln(tree.toString == `Ulong(20)`); 
+    writeln();
+
+    write(`tree(1.23).Double == 1.23 => `); writeln(tree(1.23).Double == 1.23); 
+    write(`tree.toString == Double(1.23) => `); writeln(tree.toString == `Double(1.23)`); 
+    writeln();
+
+    write(`tree([1, 2, 3]).Array == [DTree(1), DTree(2), DTree(3)] => `); 
+    writeln(tree([1, 2, 3]).Array == [DTree(1), DTree(2), DTree(3)]); 
+    write(`tree.toString == Array(Long(1);Long(2);Long(3)) => `); writeln(tree.toString == `Array(Long(1);Long(2);Long(3))`); 
+    writeln();
+
+    write(`tree(["a" : 1, "b" : 2, "c" : 3]).Object == ["a" : DTree(1), "b" : DTree(2), "c" : DTree(3)] => `); 
+    writeln(tree(["a" : 1, "b" : 2, "c" : 3]).Object == ["a" : DTree(1), "b" : DTree(2), "c" : DTree(3)]); 
+    write(`tree.toString == Object(a:Long(1);b:Long(2);c:Long(3)) => `); writeln(tree.toString == `Object(a:Long(1);b:Long(2);c:Long(3))`); 
+    writeln();
 
     DTree tree_null, tree_bool, tree_str, tree_long, tree_double, tree_array, tree_darray, tree_dobject, tree_json;
 /*    
@@ -116,10 +205,12 @@ int main(string[] args) {
     writeln("dHandler => ", dHandler);
     auto obj = dHandler.tree.Object;
     writeln("dHandler.tree.toString => \n", dHandler.tree.toString, "\n");
-    writeln("dHandler.tree.toString(0) => \n", dHandler.tree.toString(0), "\n");
-    writeln("dHandler.tree.toString(cPretty) => \n", dHandler.tree.toString(cPretty), "\n");
-    writeln("dHandler.tree.toString(cTyped) => \n", dHandler.tree.toString(cTyped), "\n");
-    writeln("dHandler.tree.toString(cPrettyTyped) => \n", dHandler.tree.toString(cPrettyTyped), "\n");
+    writeln("dHandler.tree.settings.pretty"); dHandler.tree.settings.pretty = true;
+    writeln("dHandler.tree.toString => \n", dHandler.tree.toString, "\n");
+    writeln("dHandler.tree.settings = tuple(false, true)"); dHandler.tree.settings = tuple(false, true);
+    writeln("dHandler.tree.toString => \n", dHandler.tree.toString, "\n");
+    writeln("dHandler.tree.settings.pretty = true"); dHandler.tree.settings.pretty = true;
+    writeln("dHandler.tree.toString => \n", dHandler.tree.toString, "\n");
     //writeln("dHandler.tree.value => ", dHandler.tree.value);
     //writeln("dHandler.tree.value.Type => ", dHandler.tree.value.Type);
     //writeln("dHandler.tree.Type => ", dHandler.tree.Type);
